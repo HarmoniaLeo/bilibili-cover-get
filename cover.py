@@ -1,15 +1,14 @@
-import requests
-import urllib.request
+﻿import urllib.request
+import zlib
+from lxml import etree
 
-def search(link,avnum):
-    data=requests.get(link).content.decode('utf-8')
-    import re
-    pat="http://.{2}\.hdslb.com/bfs/archive/.+?\.jpg"
-    pattern=re.compile(pat)
-    result=pattern.findall(data)
-    return urllib.request.urlretrieve(result[0],filename=avnum+".jpg")
-
-print("av")
-avnum=input()
-link="https://www.bilibili.com/video/av"+avnum
-print("Complete:"+str(search(link,avnum)))
+tar=input()
+req=urllib.request.Request(url='https://www.bilibili.com/video/av'+tar,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36'})
+response=urllib.request.urlopen(req)
+content=response.read()
+content=zlib.decompress(content, 16+zlib.MAX_WBITS)
+text=content.decode('utf-8') 
+tree = etree.HTML(text)
+result=tree.xpath('/html/head/meta[@itemprop="image"]/@content')
+urllib.request.urlretrieve(result[0],filename="D://"+tar+".jpg")
+print("已保存：av"+tar)
